@@ -2,45 +2,64 @@ package com.springproject.course.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_user")
-public class User implements Serializable{
+public class User implements Serializable, UserDetails {
+
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String email;   
+    private String email;
     private String phone;
     private String password;
 
     @JsonIgnore
-    @OneToMany(mappedBy="client")
+    @OneToMany(mappedBy = "client")
     private List<Order> orders = new ArrayList<>();
 
-    public User(){
-    };
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "tb_user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    public User() {
+    }
+
+    ;
 
     public User(Long id, String name, String email, String phone, String password) {
-        
+
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.password = password;
-        
+
     }
 
     public Long getId() {
@@ -97,33 +116,63 @@ public class User implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         User other = (User) obj;
         if (id == null) {
-            if (other.id != null)
+            if (other.id != null) {
                 return false;
-        } else if (!id.equals(other.id))
+            }
+        } else if (!id.equals(other.id)) {
             return false;
+        }
         return true;
     }
 
-    
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
 
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        // TODO Auto-generated method stub
+        return true;
+    }
 
-    
+    @Override
+    public boolean isAccountNonLocked() {
+        // TODO Auto-generated method stub
+        return true;
+    }
 
-    
+    @Override
+    public boolean isCredentialsNonExpired() {
+        // TODO Auto-generated method stub
+        return true;
+    }
 
+    @Override
+    public boolean isEnabled() {
+        // TODO Auto-generated method stub
+        return true;
 
-    
+    }
 
-
-
+    public void addRole(Role role) {
+        roles.add(role);
+    }
 
 }

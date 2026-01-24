@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.springproject.course.dto.response.UserDTO;
 import com.springproject.course.entities.User;
 import com.springproject.course.services.UserService;
 
@@ -26,9 +27,10 @@ public class UserResource {
     @Autowired
     private UserService service;
 
+    //@PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<User>> findAll() {
-        List<User> list = service.findAll();
+    public ResponseEntity<List<UserDTO>> findAllDTO() {
+        List<UserDTO> list = service.findAll();
         return ResponseEntity.ok().body(list);
     }
 
@@ -38,6 +40,7 @@ public class UserResource {
         return ResponseEntity.ok().body(obj);
     }
 
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<User> insert(@RequestBody User obj) {
         obj = service.insert(obj);

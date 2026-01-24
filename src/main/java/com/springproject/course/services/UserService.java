@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.springproject.course.dto.response.UserDTO;
 import com.springproject.course.entities.User;
 import com.springproject.course.repositories.UserRepository;
 import com.springproject.course.services.exceptions.DatabaseException;
@@ -21,9 +22,12 @@ public class UserService {
     @Autowired
     private UserRepository repository;
 
-    public List<User> findAll() {
-        return repository.findAll();
+    public List<UserDTO> findAll() {
+        return repository.findAll()
+        .stream().map(p -> new UserDTO(p.getName(),p.getEmail(),p.getPhone()))
+        .toList();
     }
+
 
     public User findById(Long id) {
         Optional<User> obj = repository.findById(id);
